@@ -24,7 +24,7 @@
 !/tmp/pids/
 !/tmp/pids/.keep
 
-tmp/cache/*
+/tmp/cache/*
 
 
 # Ignore uploaded files in development.
