@@ -1,4 +1,5 @@
 class PlayerController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: [:create]
   def index
     @player = Player.all
     render json: @player
@@ -15,16 +16,23 @@ class PlayerController < ApplicationController
   end
 
   def create
-    @exists = Player.find(name: body_params[:name])
-    if @exists.length > 0:
-      render json: @exists[0]
+    @exists = Player.where(name: body_params[:name])
+    if @exists.exists?
+      render json: @exists.first
       end
     @player = Player.new(body_params)
     @player.user_name = random_username
+    @player.is_bot = false
     if @player.save
       render json: @player
     else
       render json: @player.errors
     end
   end
+end
+
+def random_username
+  random_string = "#"
+  random_string += (0...5).map { (65 + rand(26)).chr }.join
+  random_string
 end
