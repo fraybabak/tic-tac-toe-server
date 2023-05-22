@@ -1,10 +1,16 @@
 class PlayerController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:create]
-  def index
-    @player = Player.all
-    render json: @player
-  end
 
+  def index
+    @players = Player.all # Include wins and losses in the selection
+    @players.each do |player|
+      player.wins = Game.where(winner_id: player.id, status: "finished").count
+      player.losses = Game.where.not(winner_id: player.id)
+        .where(status: "finished").where("player_one_id = ? OR player_two_id = ?", player.id, player.id).count
+      player.draws = Game.where(status: "draw").where("player_one_id = ? OR player_two_id = ?", player.id, player.id).count
+    end
+    render json: @players
+  end
 
   def get_player
     @player = Player.find(params[:id])
