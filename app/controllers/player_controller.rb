@@ -19,14 +19,15 @@ class PlayerController < ApplicationController
     @exists = Player.where(name: body_params[:name])
     if @exists.exists?
       render json: @exists.first
-      end
-    @player = Player.new(body_params)
-    @player.user_name = random_username
-    @player.is_bot = false
-    if @player.save
-      render json: @player
     else
-      render json: @player.errors
+      @player = Player.new(body_params)
+      @player.user_name = random_username
+      @player.is_bot = false
+      if @player.save
+        render json: @player
+      else
+        render json: @player.errors
+      end
     end
   end
 end

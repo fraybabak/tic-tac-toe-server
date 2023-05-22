@@ -5,3 +5,8 @@
 #
 #   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
 #   Character.create(name: "Luke", movie: movies.first)
+
+player = Player.where(name: "Computer",is_bot: true)
+if !player.exists?
+    Player.create(name: "Computer",is_bot: true)
+end

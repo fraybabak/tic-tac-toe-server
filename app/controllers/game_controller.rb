@@ -18,26 +18,38 @@ class GameController < ApplicationController
 
     def create
         player_one = params[:player_one]
-        player_two = params[:player_two]
         game_type = params[:game_type]
         @player_one = Player.find_by(id: player_one)
+
         if @player_one.nil?
             render json: { error: 'Player one not found' }, status: :not_found
             return
         end
 
-        @player_two = Player.find_by(id: player_two)
-        if @player_two.nil?
+        if game_type == 1
+            @player_two = Player.where(is_bot: true).first
+
+            if @player_two.nil?
+            @player_two = Player.new(name: 'Computer', user_name: '#bot', is_bot: true)
+            @player_two.save
+            end
+        else
+            player_two = params[:player_two]
+            @player_two = Player.find_by(id: player_two)
+
+            if @player_two.nil?
             render json: { error: 'Player two not found' }, status: :not_found
             return
+            end
         end
+
         @game = Game.new(body_params)
         @game.status = :created
         @game.player_one = @player_one
         @game.player_two = @player_two
+
         if @game.save
-            render json: @game, status: :created
-        
+            render json: {game: @game, player_one: @player_one , player_two: @player_two}, status: :created
         else
             render json: { error: @game.errors.full_messages.join(', ') }, status: :unprocessable_entity
         end

@@ -3,7 +3,7 @@ class MoveController < ApplicationController
     include MoveHelper
 
     def list
-        @moves = Move.find_by(game_id: params[:game_id])
+        @moves = Move.where(game_id: params[:game_id]).order(:created_at)
         render json: @moves
     end
 
@@ -20,10 +20,14 @@ class MoveController < ApplicationController
 
     def create
         # Check if game exists
-        @game = Game.where(id: body_params[:game_id]).where.not(status: 'finished').first
+        @game = Game.where(id: body_params[:game_id]).where.not(status: 'finished').where.not(status: 'draw').first
         if @game.nil?
             render json: { error: 'Game not found' }, status: :not_found
             return
+        end
+        if @game.status == 'created'
+            @game.status = 'running'
+            @game.save
         end
 
         # Check if player exists
@@ -50,7 +54,7 @@ class MoveController < ApplicationController
         @move = Move.new(player_id: body_params[:player_id], position: body_params[:position], created_at: Time.now, updated_at: Time.now, game_id: body_params[:game_id])
 
         if @move.save
-            render json: {move: @move, state: check_winner(body_params[:player_id],body_params[:game_id] )}, status: :created
+            render json: {move: @move, stat: check_winner(body_params[:player_id],body_params[:game_id] )}, status: :created
         else
             render json: { error: @move.errors.full_messages.join(', ') }, status: :unprocessable_entity
         end
@@ -76,21 +80,30 @@ class MoveController < ApplicationController
       ]
     
       moves = Move.where(player_id: player_id, game_id: game_id).pluck(:position)
-    
       if moves.count < 3
-        return 'running'
+        return { game: @game, winner: nil, line: nil}
       end
+      @game = Game.find_by(id: game_id)
     
       lines.each do |line|
-        return line if (line - moves).empty?
+        is_winner = line if (line - moves).empty?
+        if is_winner
+          @game.status = :finished
+          @game.winner_id = player_id
+          @game.save
+          return { game: @game, winner: player_id, line: is_winner}
+        end
       end
 
       # Check if there are no more moves
        if Move.where(game_id: game_id).count == 9
-            return 'draw'
+            
+            @game.status = :draw
+            @game.save
+            return { game: @game, winner: nil, line: nil}
         end
     
-       return 'running'
+       return { game: @game, winner: nil, line: nil}
     end
 
 
