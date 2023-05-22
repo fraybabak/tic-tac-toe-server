@@ -51,3 +51,9 @@ there is a postman collection in the root directory of the project.
 ```bash
 tictoc.postman_collection.json
 ```
+
+## keep in mind
+
+the game bot is not smart, it just play randomly.
+bot is handled in front-end side, so you can play with bot in the front-end side.
+bot algorith is poor minmax.
