@@ -3,11 +3,12 @@ class GameController < ApplicationController
 
     def list
         @games = Game
-            .joins("INNER JOIN players AS players_one ON players_one.id = games.player_one_id")
-            .joins("INNER JOIN players AS players_two ON players_two.id = games.player_two_id")
-            .joins("INNER JOIN players AS winners ON winners.id = games.winner_id")
+            .joins("LEFT JOIN players AS players_one ON players_one.id = games.player_one_id")
+            .joins("LEFT JOIN players AS players_two ON players_two.id = games.player_two_id")
+            .joins("LEFT JOIN players AS winners ON winners.id = games.winner_id")
             .select('games.*, players_one.name AS player_one_name, players_two.name AS player_two_name, winners.name AS winner_name')
             .all
+
 
         render json: @games
     end

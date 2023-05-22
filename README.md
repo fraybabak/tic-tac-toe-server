@@ -1,24 +1,53 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+this is a simple tic-toc-toe game server.
 
-Things you may want to cover:
+# Ruby version
 
-* Ruby version
+ruby 3.2.2
 
-* System dependencies
+# Database creation
 
-* Configuration
+- Database initialization
+  the database is sqlite3, so you don't need to install any database server.
 
-* Database creation
+```bash
+rails db:migrate
+```
 
-* Database initialization
+- Deployment instructions
 
-* How to run the test suite
+```bash
+bundle install
+rails db:migrate
+rails s -p 3001
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+# database schema
 
-* Deployment instructions
+there is three tables in the database.
 
-* ...
+```bash
+Player table
+| id | name | username | is_bot | created_at | updated_at |
+```
+
+```bash
+Game table
+
+| id | player_one_id | player_two_id | winner_id | status | game_type | created_at | updated_at |
+```
+
+```bash
+Move table
+
+| id | game_id | player_id | position | created_at | updated_at |
+```
+
+# API
+
+there is a postman collection in the root directory of the project.
+
+```bash
+tictoc.postman_collection.json
+```

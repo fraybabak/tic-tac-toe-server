@@ -3,6 +3,10 @@ class MoveController < ApplicationController
     include MoveHelper
 
     def list
+        if params[:game_id].nil?
+            render json: { error: 'Game id not found' }, status: :not_found
+            return
+        end
         @moves = Move.where(game_id: params[:game_id]).order(:created_at)
         render json: @moves
     end
